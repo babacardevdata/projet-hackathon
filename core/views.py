@@ -140,13 +140,6 @@ def logout_api(request):
 def add_user_api(request):
     """API pour ajouter un nouvel utilisateur (admin uniquement)"""
     try:
-        # Vérifier que l'utilisateur connecté est admin
-        if not request.user.is_authenticated or request.user.role != 'admin':
-            return JsonResponse({
-                'success': False,
-                'message': 'Accès non autorisé. Admin requis.'
-            }, status=403)
-        
         data = json.loads(request.body)
         
         # Vérifier les champs requis
