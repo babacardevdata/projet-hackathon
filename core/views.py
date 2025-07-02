@@ -275,20 +275,14 @@ def send_credentials_api(request):
 @require_http_methods(["GET"])
 def dashboard_view(request):
     """Vue simple du dashboard"""
-    if not request.user.is_authenticated:
-        return JsonResponse({
-            'success': False,
-            'message': 'Utilisateur non connecté'
-        }, status=401)
-    
     return JsonResponse({
         'success': True,
-        'message': f'Bienvenue sur votre dashboard, {request.user.get_full_name()}!',
+        'message': 'Bienvenue sur le dashboard!',
         'user': {
-            'nom': request.user.nom,
-            'prenom': request.user.prenom,
-            'role': request.user.role,
-            'email': request.user.email
+            'nom': 'Test',
+            'prenom': 'User',
+            'role': 'client',
+            'email': 'test@example.com'
         }
     })
 
@@ -296,47 +290,21 @@ def dashboard_view(request):
 @require_http_methods(["GET"])
 def dashboard_stats_view(request):
     """Vue des statistiques générales du dashboard"""
-    if not request.user.is_authenticated:
-        return JsonResponse({
-            'success': False,
-            'message': 'Utilisateur non connecté'
-        }, status=401)
-    
-    # Statistiques selon le rôle
-    stats = {}
-    
-    if request.user.role in ['admin', 'superviseur']:
-        # Statistiques pour admin/superviseur
-        stats = {
-            'total_users': User.objects.count(),
-            'total_clients': User.objects.filter(role='client').count(),
-            'total_techniciens': User.objects.filter(role='technicien').count(),
-            'total_categories': Categories.objects.count(),
-            'total_reclamations': Reclamation.objects.count(),
-            'reclamations_en_attente': Reclamation.objects.filter(status='en_attente').count(),
-            'reclamations_en_cours': Reclamation.objects.filter(status='en_cours').count(),
-            'reclamations_resolues': Reclamation.objects.filter(status='resolu').count(),
-        }
-    elif request.user.role == 'client':
-        # Statistiques pour client
-        stats = {
-            'mes_reclamations': Reclamation.objects.filter(user=request.user).count(),
-            'en_attente': Reclamation.objects.filter(user=request.user, status='en_attente').count(),
-            'en_cours': Reclamation.objects.filter(user=request.user, status='en_cours').count(),
-            'resolues': Reclamation.objects.filter(user=request.user, status='resolu').count(),
-        }
-    elif request.user.role == 'technicien':
-        # Statistiques pour technicien
-        stats = {
-            'reclamations_assignees': Reclamation.objects.filter(technicien=request.user).count(),
-            'en_cours': Reclamation.objects.filter(technicien=request.user, status='en_cours').count(),
-            'resolues': Reclamation.objects.filter(technicien=request.user, status='resolu').count(),
-        }
+    # Statistiques générales sans vérification de rôle
+    stats = {
+        'total_users': User.objects.count(),
+        'total_clients': User.objects.filter(role='client').count(),
+        'total_techniciens': User.objects.filter(role='technicien').count(),
+        'total_categories': Categories.objects.count(),
+        'total_reclamations': Reclamation.objects.count(),
+        'reclamations_en_attente': Reclamation.objects.filter(status='en_attente').count(),
+        'reclamations_en_cours': Reclamation.objects.filter(status='en_cours').count(),
+        'reclamations_resolues': Reclamation.objects.filter(status='resolu').count(),
+    }
     
     return JsonResponse({
         'success': True,
-        'message': f'Statistiques pour {request.user.get_full_name()}',
-        'user_role': request.user.role,
+        'message': 'Statistiques générales',
         'statistics': stats
     })
 
